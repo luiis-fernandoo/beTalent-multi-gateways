@@ -117,7 +117,3 @@ Para o funcionamento correto das integrações, é imprescindível configurar as
 
 * **Swagger:** `http://localhost:8000/api/documentation`
 * **Postman Collection:** [Download da pasta de Requests (Google Drive)](https://drive.google.com/drive/folders/1IrsG76qYQPBks09uSZVWyt7mEfQzOQ5B?usp=sharing)
-
----
-
-### Gostaria que eu formatasse mais alguma parte ou adicionasse o seu LinkedIn/Contato ao final do arquivo? Seria uma ótima forma de fechar o projeto com chave de ouro.
