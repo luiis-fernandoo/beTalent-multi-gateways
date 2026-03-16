@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class LoginRequest extends FormRequest
+class TransactionRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,8 +23,13 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => 'required|email',
-            'password' => 'required',
+            'data.products' => 'required|array',
+            'data.products.*.product_id' => 'required|exists:products,id',
+            'data.products.*.quantity' => 'required|integer|min:1',
+            'data.client.name' => 'required|string',
+            'data.client.email' => 'required|email',
+            'data.client.card_number' => 'required|string',
+            'data.client.cvv' => 'required|integer',
         ];
     }
 }

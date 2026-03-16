@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class UserRequest extends FormRequest
+class UserUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,12 +22,9 @@ class UserRequest extends FormRequest
      */
     public function rules(): array
     {
-        dd('oi?');
         return [
-            'username' => 'required:string',
-            'email' => 'required:email',
-            'password' => 'required:password',
-            'role_id' => 'required:integer',
+            'username' => 'nullable|string',
+            'role_id' => 'nullable|integer',
         ];
     }
 }

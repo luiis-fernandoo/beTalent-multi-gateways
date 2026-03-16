@@ -3,31 +3,24 @@
 namespace App\Http\Controllers;
 
 use App\Http\Console\Constants\UserConstants;
-use App\Http\Requests\LoginRequest;
-use App\Http\Requests\UserPostRequest;
-use App\Http\Requests\UserUpdateRequest;
-use App\Models\CustomSessions;
+use App\Http\Requests\ProductPostRequest;
+use App\Http\Requests\ProductUpdateRequest;
+use App\Models\Product;
 use App\Models\User;
 use App\Repositories\ProductRepository;
-use App\Repositories\SessionRepository;
 use App\Repositories\UserRepository;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
-class UserController extends Controller
+class ProductController extends Controller
 {
-
-    public function index()
-    {
+    public function index(){
         return response()->json([
             'success' => true,
-            'data' => User::all()
-        ], 201);
+            'data' => Product::all()
+        ]);
     }
 
-    public function store(UserPostRequest $request)
-    {
+    public function store(ProductPostRequest $request){
         $manager = User::find($request->header('x-user-id'));
 
         if(!$manager->role_id == UserConstants::ADMIN || !$manager->role_id == UserConstants::MANAGER) {
@@ -38,7 +31,7 @@ class UserController extends Controller
         }
 
         try {
-            $user = (new UserRepository())->createUser($request->validated());
+            $product = (new ProductRepository())->createProduct($request->validated());
         }catch (\Exception $exception){
             return response()->json([
                 'success' => false,
@@ -48,29 +41,11 @@ class UserController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $user
-        ], 201);
+            'data' => $product
+        ]);
     }
 
-    public function update(UserUpdateRequest $request, $userId){
-        $validated = $request->validated();
-
-        try {
-            $user = (new UserRepository())->updateUser($validated, $userId);
-        }catch (\Exception $exception){
-            return response()->json([
-                'success' => false,
-                'message' => $exception->getMessage()
-            ]);
-        }
-
-        return response()->json([
-            'success' => true,
-            'data' => $user
-        ], 202);
-    }
-
-    public function destroy(Request $request, $userId){
+    public function update(ProductUpdateRequest $request, $productId){
         $manager = User::find($request->header('x-user-id'));
 
         if(!$manager->role_id == UserConstants::ADMIN || !$manager->role_id == UserConstants::MANAGER) {
@@ -81,7 +56,7 @@ class UserController extends Controller
         }
 
         try {
-            (new UserRepository())->destroyUser($userId);
+            $product = (new ProductRepository())->updateProduct($request->validated(), $productId);
         }catch (\Exception $exception){
             return response()->json([
                 'success' => false,
@@ -91,33 +66,32 @@ class UserController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Usuário deletado'
-        ], 201);
+            'data' => $product
+        ]);
     }
 
-    public function login(LoginRequest $request)
-    {
-        $validated = $request->validated();
+    public function destroy(Request $request, $productId){
+        $manager = User::find($request->header('x-user-id'));
 
-        if(!Auth::attempt($validated)) {
+        if(!$manager->role_id == UserConstants::ADMIN || !$manager->role_id == UserConstants::MANAGER) {
             return response()->json([
                 'success' => false,
-                'message' => 'Credenciais inválidas'
+                'message' => 'Você não tem permissão para isso!'
             ], 401);
         }
 
-        $session = (new SessionRepository())->createSession(
-            [
-                'user_id' => Auth::user()->id,
-                'ip_address' => $request->ip(),
-                'token' => Auth::user()->createToken('auth_token')->plainTextToken,
-                'expiration_token' => Carbon::now()->addMinutes(30),
-            ]
-        );
+        try {
+            (new ProductRepository())->destroyProduct($productId);
+        }catch (\Exception $exception){
+            return response()->json([
+                'success' => false,
+                'message' => $exception->getMessage()
+            ]);
+        }
 
         return response()->json([
             'success' => true,
-            'token' => $session->token
-        ], 202);
+            'message' => 'produto deletado'
+        ], 201);
     }
 }

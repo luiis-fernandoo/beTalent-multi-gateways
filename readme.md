@@ -1,0 +1,4 @@
+- Rodar migrations após configurar .env
+- Rodar seed de roles
+- Rodar seed de usuário Master
+- 

@@ -35,4 +35,18 @@ return [
         ],
     ],
 
+    'gateways' => [
+        'gateway_1' => [
+            'url' => env('GATEWAY_1_URL'),
+            'token' => env('GATEWAY_CREDENTIAL_TOKEN'),
+            'email' => env('GATEWAY_CREDENTIAL_EMAIL'),
+        ],
+        'gateway_2' => [
+            'url' => env('GATEWAY_2_URL'),
+            'Gateway-Auth-Token' => env('GATEWAY_AUTH_TOKEN'),
+            'Gateway-Auth-Secret' => env('GATEWAY_AUTH_SECRET'),
+        ],
+
+    ],
+
 ];

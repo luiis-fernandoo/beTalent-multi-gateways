@@ -16,5 +16,6 @@ class AuthenticateUser
     public function handle(Request $request, Closure $next): Response
     {
 
+        dd('oooi', $request);
     }
 }
