@@ -15,6 +15,20 @@ use Illuminate\Support\Str;
 
 class TransactionService
 {
+    public function listAllTransactions()
+    {
+        $gatewaysToSend = Gateway::Where('is_active', 1)->orderBy('priority', 'ASC')->get();
+        $responses = [];
+
+        foreach($gatewaysToSend as $gateway){
+            $gatewaySlug = Str::slug($gateway->name, '_');
+            $service = GatewayProvider::getService($gatewaySlug);
+            $responses[$gatewaySlug] = $service->getAllTransactions();
+        }
+
+        return $responses;
+
+    }
     public function mountDataToProccessTransation($transaction)
     {
         $gatewaysToSend = Gateway::Where('is_active', 1)->orderBy('priority', 'ASC')->get();
@@ -24,24 +38,22 @@ class TransactionService
         DB::beginTransaction();
 
         foreach($gatewaysToSend as $gateway){
+            $gatewaySlug = Str::slug($gateway->name, '_');
+            $service = GatewayProvider::getService($gatewaySlug);
+            $data = $service->mountDataToSend($transaction['data']);
+            $data['gateway'] = $gatewaySlug;
+            $transaction['request'] = $data;
+            $response = $service->sendRequestToGateway($data);
+            $responses['gateways'][$gatewaySlug] = $response;
 
-                $gatewaySlug = Str::slug($gateway->name, '_');
-                $service = GatewayProvider::getService($gatewaySlug);
-                $data = $service->mountDataToSend($transaction['data']);
-                $data['gateway'] = $gatewaySlug;
-                $transaction['request'] = $data;
-                $response = $service->sendRequestToGateway($data);
-                $responses['gateways'][$gatewaySlug] = $response;
+            if(collect($response)->has('id')){
+                $transactionSuccess = true;
+                $client = (new ClientRepository())->createClient($transaction['data']['client']);
+                $transaction = (new TransactionRepository())->createTransaction($transaction, $client, $gateway, $response);
 
-                if(collect($response)->has('id')){
-                    $transactionSuccess = true;
-                    $client = (new ClientRepository())->createClient($transaction['data']['client']);
-                    $transaction = (new TransactionRepository())->createTransaction($transaction, $client, $gateway, $response);
-
-                    $responses['gateways'][$gatewaySlug] = $transaction;
-
-                    break;
-                }
+                $responses['gateways'][$gatewaySlug] = $transaction;
+                break;
+            }
         }
 
         DB::commit();
@@ -62,6 +74,13 @@ class TransactionService
         }
 
         $gateway = Gateway::find($transaction->gateway_id);
+
+        if(!$gateway->is_active == 1){
+            return [
+                'error' => 'Gateway não disponível!'
+            ];
+        }
+
         $gatewaySlug = Str::slug($gateway->name, '_');
         $service = GatewayProvider::getService($gatewaySlug);
 

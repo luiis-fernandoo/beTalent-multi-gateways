@@ -16,8 +16,8 @@ class Gateway2Service
         ];
     }
 
-    public function getBaseUrl($data): string {
-        return config("services.gateways.{$data['gateway']}.url");
+    public function getBaseUrl(): string {
+        return config("services.gateways.gateway_2.url");
     }
 
     public function mountDataToSend(array $data)
@@ -50,7 +50,7 @@ class Gateway2Service
     public function sendRequestToGateway($data)
     {
         return json_decode((new RequestService())->setHeaders($data['headers'])->send(
-            $this->getBaseUrl($data) . 'transacoes',
+            $this->getBaseUrl() . 'transacoes',
             $data['body']
         ));
     }
@@ -58,8 +58,16 @@ class Gateway2Service
     public function sendRequestToGatewayChargeBack($data)
     {
         return json_decode((new RequestService())->setHeaders($this->getHeaders())->send(
-            $this->getBaseUrl($data) . 'transacoes/reembolso',
+            $this->getBaseUrl() . 'transacoes/reembolso',
             ['id' => $data['external_id']])
+        );
+    }
+
+    public function getAllTransactions()
+    {
+        return json_decode((new RequestService())->setHeaders($this->getHeaders())->send(
+            $this->getBaseUrl() . 'transacoes/',
+            [], 'GET')
         );
     }
 }

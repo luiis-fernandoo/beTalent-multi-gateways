@@ -1,0 +1,40 @@
+services:
+  # Container do Banco de Dados
+  db:
+    image: mysql:8.0
+    container_name: betalent-db
+    restart: always
+    environment:
+      MYSQL_DATABASE: be_talent
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+  # Container do Laravel
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: betalent-app
+    restart: always
+    volumes:
+      - .:/var/www
+    depends_on:
+      - db
+
+  # Servidor Web Nginx
+  nginx:
+    image: nginx:alpine
+    container_name: betalent-nginx
+    ports:
+      - "8010:80"
+    volumes:
+      - .:/var/www
+      - ./docker/nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+
+volumes:
+  db_data:

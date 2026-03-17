@@ -14,7 +14,7 @@ class TransactionController extends Controller
     {
         return response()->json([
             'success' => true,
-            'data' => (new TransactionRepository())->allTransactions()
+            'data' => (new TransactionService())->listAllTransactions()
         ]);
     }
 
@@ -52,7 +52,7 @@ class TransactionController extends Controller
         }
 
         return response()->json([
-            'success' => collect($response)->has('error') ? false : true,
+            'success' => !collect($response)->has('error') ? true : false,
             'data' => $response
         ]);
     }

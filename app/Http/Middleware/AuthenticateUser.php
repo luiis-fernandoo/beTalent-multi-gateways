@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,6 +17,7 @@ class AuthenticateUser
     public function handle(Request $request, Closure $next): Response
     {
 
-        dd('oooi', $request);
+        dd($request->url());
+        $user = User::find($request->header('x-user-id'));
     }
 }

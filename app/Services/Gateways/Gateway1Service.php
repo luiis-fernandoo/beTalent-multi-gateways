@@ -29,8 +29,8 @@ class Gateway1Service implements GatewayInterface
         ])->send(config('services.gateways.gateway_1.url') . 'login', $credentialsToLogin))->token ?? null;
     }
 
-    public function getBaseUrl($data): string {
-        return config("services.gateways.{$data['gateway']}.url");
+    public function getBaseUrl(): string {
+        return config("services.gateways.gateway_1.url");
     }
 
     public function mountDataToSend(array $data): array
@@ -63,7 +63,7 @@ class Gateway1Service implements GatewayInterface
     public function sendRequestToGateway($data)
     {
         return json_decode((new RequestService())->setHeaders($data['headers'])->send(
-            $this->getBaseUrl($data) . 'transactions',
+            $this->getBaseUrl() . 'transactions',
             $data['body']
         ));
     }
@@ -71,8 +71,16 @@ class Gateway1Service implements GatewayInterface
     public function sendRequestToGatewayChargeBack($data)
     {
         return json_decode((new RequestService())->setHeaders($this->getHeaders())->send(
-            $this->getBaseUrl($data) . 'transactions/' . $data['external_id'] . '/charge_back',
+            $this->getBaseUrl() . 'transactions/' . $data['external_id'] . '/charge_back',
             [])
+        );
+    }
+
+    public function getAllTransactions()
+    {
+        return json_decode((new RequestService())->setHeaders($this->getHeaders())->send(
+            $this->getBaseUrl() . 'transactions/',
+            [], 'GET')
         );
     }
 }
