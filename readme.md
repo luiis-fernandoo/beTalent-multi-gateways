@@ -1,119 +1,97 @@
-# 🚀 beTalent Multi-Gateways API
+# 🚀 Be-Talent Multi-Gateways API
 
-Este projeto é uma API robusta desenvolvida em **Laravel 10** para gestão de transações financeiras com suporte a múltiplos gateways de pagamento. O sistema conta com redundância automática, gestão completa de produtos e clientes, além de um sistema de controle de acesso (RBAC).
-
-## 🛠️ Tecnologias Utilizadas
-
-* **Framework:** Laravel 10
-* **Autenticação:** Laravel Sanctum
-* **Banco de Dados:** MySQL
-* **Documentação:** Swagger & Postman Collection
-* **Ambiente:** Docker
+Este projeto é uma API robusta desenvolvida em **Laravel 10** para gestão de transações financeiras com suporte a múltiplos gateways de pagamento. O foco principal foi a implementação da lógica de **Nível 3** do desafio, estruturando a resiliência entre gateways e o cálculo dinâmico de múltiplos produtos.
 
 ---
 
-## 📥 Instalação e Configuração
+### 📢 Nota do Desenvolvedor
+Este projeto foi desenvolvido integralmente durante um único final de semana. Priorizei a arquitetura do motor de pagamentos e a integração modular.
+* **Nível de Entrega:** Implementação de **Nível 3** concluída (Cálculo de múltiplos produtos no back-end e integração com gateways autenticados).
+* **Uso de IA:** O projeto contou com o auxílio de IA como ferramenta de aceleração de produtividade e auxílio na configuração de ambiente, porém toda a lógica de negócio e arquitetura foram estruturadas manualmente.
+* **Limitações de Tempo:** Devido ao prazo restrito, os seguintes itens ficaram como próximos passos (incompletos):
+    * **TDD (Testes Unitários):** Não houve tempo para implementação da cobertura de testes.
+    * **RBAC (Controle de Acesso):** A estrutura de Roles (Admin, Manager, etc.) foi mapeada no banco de dados, mas a restrição total de todas as rotas via middleware não foi finalizada.
+    * **Swagger:** A ferramenta está instalada, mas a documentação detalhada de cada endpoint ficou parcial.
 
-### Opção 1: Instalação Local (Sem Docker)
+---
 
-1. **Clonar o repositório:**
-```bash
-git clone https://github.com/luiis-fernandoo/beTalent-multi-gateways.git
-cd beTalent-multi-gateways
+### 🛠️ Tecnologias Utilizadas
+* **Framework:** Laravel 10 (PHP 8.2)
+* **Banco de Dados:** MySQL 8.0
+* **Ambiente:** Docker (Nginx + PHP-FPM) ou Instalação Local
+* **Autenticação:** Laravel Sanctum
 
-```
+---
 
-2. **Instalar dependências e configurar:**
-```bash
-composer install
-cp .env.example .env
-php artisan key:generate
+### 📥 Instalação e Configuração
 
-```
-
-3. **Banco de Dados:**
-* Configure suas credenciais no `.env`.
-* Execute as migrações e alimente o banco:
-
-
-```bash
-php artisan migrate
-php artisan db:seed --class=RolesSeeder
-php artisan db:seed --class=UsersSeeder
-php artisan db:seed --class=GatewaysSeeder
-php artisan db:seed --class=ProductsSeeder
-
-```
-
-### Opção 2: Instalação via Docker
+#### Opção 1: Via Docker (Recomendado)
+O ambiente Docker foi configurado para responder na porta **3000**.
 
 1. **Subir os containers:**
-```bash
-docker-compose up -d
+   ```bash
+   cp .env.example .env
+   docker compose up -d
+   ```
 
-```
+2. **Configuração interna:**
+   ```bash
+   # Instalação de dependências e chaves
+   docker compose exec app composer install
+   docker compose exec app php artisan key:generate
 
+   # Ajuste de permissões (Essencial para Linux/Docker)
+   docker compose exec app chown -R www-data:www-data storage bootstrap/cache
+   docker compose exec app chmod -R 775 storage bootstrap/cache
 
-2. **Configuração Inicial:**
-```bash
-docker exec -it betalent-app composer install
-docker exec -it betalent-app php artisan key:generate
-docker exec -it betalent-app php artisan migrate
-
-```
-
-
-3. **Alimentar o Banco:**
-```bash
-docker exec -it betalent-app php artisan db:seed --class=RolesSeeder
-docker exec -it betalent-app php artisan db:seed --class=UsersSeeder
-docker exec -it betalent-app php artisan db:seed --class=GatewaysSeeder
-docker exec -it betalent-app php artisan db:seed --class=ProductsSeeder
-
-```
-
-
+   # Migrações e Seeds
+   docker compose exec app php artisan migrate --seed
+   ```
+   **Acesso:** `http://localhost:3000`
 
 ---
 
-## 🔐 Autenticação e Headers
+#### Opção 2: Instalação Local (Sem Docker)
+Certifique-se de ter o PHP 8.2+ e o MySQL instalados em sua máquina.
 
-A API utiliza tokens de acesso via Sanctum. A sessão expira a cada **30 minutos**.
+1. **Preparar o projeto:**
+   ```bash
+   composer install
+   cp .env.example .env
+   php artisan key:generate
+   ```
 
-1. **Login:** `POST /api/login` (User: `admin@betalent.com` | Pass: `1234`).
-2. **Headers Obrigatórios:**
-* `x-token-access`: [Token retornado no login]
-* `x-user-id`: `1` (ou o ID do usuário logado)
+2. **Banco de Dados:**
+   Configure as credenciais do seu banco no arquivo `.env` e execute:
+   ```bash
+   php artisan migrate --seed
+   ```
 
----
-
-## ⚙️ Funcionalidades Principal
-
-### 💳 Gestão de Transações (CRUD Completo)
-
-Diferente de um simples histórico, o sistema possui um motor completo de transações:
-
-* **Criação de Compra:** Realiza a tentativa de pagamento. O sistema tentará o primeiro gateway; em caso de falha, acionará o segundo automaticamente.
-* **Visualização e Listagem:** Consulta detalhada de cada transação gerada.
-* **Estorno (Chargeback):** Possibilidade de reverter uma transação aprovada diretamente pela API, comunicando-se com o gateway de origem.
-
-### 📦 Outros Cruds
-
-* **Usuários:** Gestão completa de operadores do sistema.
-* **Produtos:** Cadastro de itens com suporte a `name` e `amount` (em centavos).
+3. **Iniciar o servidor:**
+   ```bash
+   php artisan serve --port=3000
+   ```
+   **Acesso:** `http://localhost:3000`
 
 ---
 
-## 🔌 Configuração de Gateways (.env)
+### 🔐 Autenticação e Credenciais
 
-Para o funcionamento correto das integrações, é imprescindível configurar as URLs e as chaves de autenticação no seu arquivo `.env`.
-
-> [!NOTE]
-> Consulte o arquivo `.env.example` para identificar os campos necessários para cada gateway configurado (URLs, Tokens e Credenciais de autenticação). Garanta que os mocks ou APIs dos gateways estejam acessíveis.
+A API utiliza tokens via **Sanctum**. 
+1. **Login:** `POST /api/login`
+2. **Credenciais Padrão:** `admin@betalent.com` | Senha: `1234`
+3. **Uso:** O token retornado deve ser enviado no Header `Authorization: Bearer {seu_token}`.
 
 ---
 
-## 📂 Documentação Externa
+### 💳 Diferenciais de Nível 3 Implementados
 
-* **Swagger:** `http://localhost:8000/api/documentation`
-* **Postman Collection:** [Download da pasta de Requests (Google Drive)](https://drive.google.com/drive/folders/1IrsG76qYQPBks09uSZVWyt7mEfQzOQ5B?usp=sharing)
+* **Cálculo de Carrinho no Back-end:** A API recebe apenas os IDs e quantidades dos produtos. O valor final é calculado no servidor consultando o banco de dados, garantindo a integridade dos valores.
+* **Resiliência Multi-Gateway (Fallback):** Sistema configurado para tentar o pagamento no Gateway principal; em caso de falha técnica (erro 500 ou timeout), o segundo gateway é acionado automaticamente.
+* **Arquitetura Modular:** Facilidade para plugar novos gateways de pagamento seguindo padrões de interface.
+
+---
+
+### 📂 Documentação e Testes
+* **Postman:** Recomenda-se o uso da **Postman Collection** disponível na raiz do projeto para testar os fluxos de login, produtos e transações.
+* **Logs:** Para monitorar as tentativas de pagamento e possíveis erros, verifique `storage/logs/laravel.log` ou use `docker compose logs app`.
