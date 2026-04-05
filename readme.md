@@ -1,6 +1,6 @@
 # 🚀 Be-Talent Multi-Gateways API
 
-Este projeto é uma API robusta desenvolvida em **Laravel 10** para gestão de transações financeiras com suporte a múltiplos gateways de pagamento. O foco principal foi a implementação da lógica de **Nível 3** do desafio, estruturando a resiliência entre gateways e o cálculo dinâmico de múltiplos produtos.
+Este projeto é uma API robusta desenvolvida em **Laravel 10** para gestão de transações financeiras com suporte a múltiplos gateways de pagamento. O foco principal foi a implementação da lógica de **Nível 3** do desafio, estruturando a resiliência entre gateways e o cálculo dinâmico de múltiplos produtos. Os usuários são verificados pela role, para que seja permitido o acesso a determinadas funções/rotas através de ADMIN, FINANCE, MANAGER e USER.
 
 ---
 
@@ -10,7 +10,6 @@ Este projeto foi desenvolvido integralmente durante um único final de semana. P
 * **Uso de IA:** O projeto contou com o auxílio de IA como ferramenta de aceleração de produtividade e auxílio na configuração de ambiente, porém toda a lógica de negócio e arquitetura foram estruturadas manualmente.
 * **Limitações de Tempo:** Devido ao prazo restrito, os seguintes itens ficaram como próximos passos (incompletos):
     * **TDD (Testes Unitários):** Não houve tempo para implementação da cobertura de testes.
-    * **RBAC (Controle de Acesso):** A estrutura de Roles (Admin, Manager, etc.) foi mapeada no banco de dados, mas a restrição total de todas as rotas via middleware não foi finalizada.
     * **Swagger:** A ferramenta está instalada, mas a documentação detalhada de cada endpoint ficou parcial.
 
 ---
@@ -89,6 +88,7 @@ A API utiliza tokens via **Sanctum**.
 * **Cálculo de Carrinho no Back-end:** A API recebe apenas os IDs e quantidades dos produtos. O valor final é calculado no servidor consultando o banco de dados, garantindo a integridade dos valores.
 * **Resiliência Multi-Gateway (Fallback):** Sistema configurado para tentar o pagamento no Gateway principal; em caso de falha técnica (erro 500 ou timeout), o segundo gateway é acionado automaticamente.
 * **Arquitetura Modular:** Facilidade para plugar novos gateways de pagamento seguindo padrões de interface.
+* **RBAC Completo:** A estrutura de Roles (Admin, Manager, etc.) Usuários autenticados passam por uma verificação de permissões para que cada user tenha apenas acesso ao que lhe é permitido através do seu role.
 
 ---
 
