@@ -2,15 +2,19 @@
 
 namespace App\Repositories;
 
-use App\Models\CustomSessions;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class UserRepository
 {
     public function createUser($data)
     {
-        return User::create($data);
+        return User::create([
+            'username' => $data['username'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
+            'role_id' => $data['role_id'],
+        ]);
     }
 
     public function updateUser($data, $userId)

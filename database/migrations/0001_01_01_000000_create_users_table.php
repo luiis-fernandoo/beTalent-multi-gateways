@@ -28,6 +28,16 @@ return new class extends Migration
             $table->foreign('role_id')->references('id')->on('roles');
         });
 
+        Schema::create('route_access', function (Blueprint $table) {
+            $table->unsignedBigInteger('id')->primary()->autoIncrement();
+            $table->unsignedBigInteger('role_id');
+            $table->string('route');
+            $table->string('http_method');
+
+            $table->foreign('role_id')->references('id')->on('roles');
+
+        });
+
         Schema::create('custom_sessions', function (Blueprint $table) {
             $table->unsignedBigInteger('id')->primary()->autoIncrement()->unique();
             $table->string('token')->unique();

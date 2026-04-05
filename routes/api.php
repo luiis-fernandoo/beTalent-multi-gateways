@@ -14,8 +14,9 @@ Route::get('/', function () {
 });
 
 Route::post('/login', [UserController::class, 'login']);
+Route::post('/transactions', [TransactionController::class, 'store']);
 
-Route::group(['middleware' => SessionMiddleware::class], function () {
+Route::group(['middleware' => [SessionMiddleware::class, AuthenticateUser::class]], function () {
     Route::apiResource('user', UserController::class);
 
     Route::apiResource('product', ProductController::class);
