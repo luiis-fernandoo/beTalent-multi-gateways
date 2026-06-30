@@ -1,9 +1,13 @@
-name: Testes automatizados executados manualmente
+name: Testes automatizados executados automaticamente
 
 #Define o evento que dispara o workflow
 on:
-  workflow_dispatch:
-
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - dev
 
 #Define os jobs que serão executados
 jobs:
