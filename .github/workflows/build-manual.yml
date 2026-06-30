@@ -1,0 +1,35 @@
+name: Testes automatizados
+
+#Define o evento que dispara o workflow
+on:
+  workflow_dispatch:
+
+
+#Define os jobs que serão executados
+jobs:
+  #Define o job chamado "build"
+  build:
+    #Define o sistema operacional que será usado
+    runs-on: ubuntu-latest
+
+    #Define as etapas do job
+    steps:
+      #Define a primeira etapa chamada "Checkout"
+      - name: Criar produto
+        #Define as ações do github actions.
+        uses: actions/checkout@v3
+        with:
+          #Define a version do quickstart que será usado, como o php
+          php-version: '8.2'
+
+      - name: Instalar dependências
+        run: |
+          # Comando para instalar algo, como composer, npm, etc.
+          echo "Instalando dependências..."
+          # Adicione aqui os comandos necessários para instalar as dependências
+
+      - name: Executar testes
+        run: |
+          # Comando para executar testes, algo como php artisan test...
+          echo "Executando testes..."
+          # Adicione aqui os comandos necessários para executar os testes
